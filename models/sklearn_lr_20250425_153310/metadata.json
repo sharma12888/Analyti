@@ -1,0 +1,52 @@
+{
+  "model_id": "sklearn_lr_20250425_153310",
+  "model_type": "sklearn_lr",
+  "created_at": "2025-04-25T15:33:10.238933",
+  "train_metrics": {
+    "accuracy": 0.8742857142857143,
+    "precision": 0.8920539730134932,
+    "recall": 0.9738134206219312,
+    "f1": 0.9311424100156495,
+    "auc": 0.8717519630739807
+  },
+  "val_metrics": {
+    "accuracy": 0.8733333333333333,
+    "precision": 0.9,
+    "recall": 0.9618320610687023,
+    "f1": 0.9298892988929889,
+    "auc": 0.8758537565287265
+  },
+  "test_metrics": {
+    "accuracy": 0.86,
+    "precision": 0.8873239436619719,
+    "recall": 0.9618320610687023,
+    "f1": 0.9230769230769231,
+    "auc": 0.8304539975893934
+  },
+  "is_best": false,
+  "feature_importance": {
+    "num__loan_amount": 0.4296999432680611,
+    "num__annual_income": 0.11034023332181488,
+    "num__debt_to_income_ratio": 0.4936461122754431,
+    "num__monthly_debt": 0.08472330048449195,
+    "num__credit_score": 0.5619491376389754,
+    "num__num_credit_inquiries": 0.006929739921891271,
+    "num__num_late_payments_30d": 0.49693983417530035,
+    "num__num_late_payments_60d": 0.8410017503029177,
+    "num__num_late_payments_90d": 1.1209414178437447,
+    "num__credit_line_age": 0.017895674173962695,
+    "num__loan_term": 0.04479616502312842,
+    "num__interest_rate": 0.14822033621251715,
+    "cat__employment_status_Retired": 0.3497798751874637,
+    "cat__employment_status_Self-employed": 0.3857034171033134,
+    "cat__employment_status_Unemployed": 0.13901680936633368,
+    "cat__loan_purpose_Debt consolidation": 0.4220766686310175,
+    "cat__loan_purpose_Education": 0.038486907477736955,
+    "cat__loan_purpose_Home improvement": 0.20551843641934722,
+    "cat__loan_purpose_Other": 0.08166656274058451,
+    "cat__home_ownership_Other": 0.18783219213984143,
+    "cat__home_ownership_Own": 0.36449562673295843,
+    "cat__home_ownership_Rent": 0.41654515355135485,
+    "cat__application_type_Joint": 0.2686390578401005
+  }
+}
