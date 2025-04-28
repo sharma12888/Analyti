@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Data Management - Risk Score Analysis{% endblock %}
+
+{% block header %}Data Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Data Ingestion</h5>
+                <p class="card-text">Ingest data from various sources into the pipeline.</p>
+                <form action="{{ url_for('data') }}" method="post" class="my-3">
+                    <input type="hidden" name="action" value="ingest">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ingestHistorical" name="ingest_historical">
+                                <label class="form-check-label" for="ingestHistorical">
+                                    Ingest Historical Data
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ingestPostgresql" name="ingest_postgresql" checked>
+                                <label class="form-check-label" for="ingestPostgresql">
+                                    Ingest PostgreSQL Data
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ingestDaily" name="ingest_daily" checked>
+                                <label class="form-check-label" for="ingestDaily">
+                                    Ingest Daily Data
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dailyDate" class="form-label">Daily Date (optional):</label>
+                            <input type="date" class="form-control" id="dailyDate" name="daily_date">
+                            <small class="form-text text-muted">If not specified, yesterday's date will be used.</small>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Start Data Ingestion</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Data Validation</h5>
+                <p class="card-text">Run validation checks on the ingested data.</p>
+                <form action="{{ url_for('data') }}" method="post" class="my-3">
+                    <input type="hidden" name="action" value="validate">
+                    <button type="submit" class="btn btn-primary">Validate Data</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Feature Engineering</h5>
+                <p class="card-text">Run feature engineering on the validated data.</p>
+                <form action="{{ url_for('data') }}" method="post" class="my-3">
+                    <input type="hidden" name="action" value="features">
+                    <button type="submit" class="btn btn-primary">Run Feature Engineering</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Data Statistics</h5>
+                
+                {% if data_stats %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Table</th>
+                                <th>Record Count</th>
+                                <th>Last Updated</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for table in data_stats %}
+                            <tr>
+                                <td>{{ table.name }}</td>
+                                <td>{{ table.record_count }}</td>
+                                <td>{{ table.last_updated }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if table.status == 'valid' else 'danger' }}">
+                                        {{ table.status|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary">View Details</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p>No data statistics available. Run data ingestion first.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

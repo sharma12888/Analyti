@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Model Management - Risk Score Analysis{% endblock %}
+
+{% block header %}Model Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Model Training</h5>
+                <p class="card-text">Train machine learning models for risk assessment.</p>
+                <form action="{{ url_for('models') }}" method="post" class="my-3">
+                    <input type="hidden" name="action" value="train">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="modelType" class="form-label">Model Type:</label>
+                            <select class="form-select" id="modelType" name="model_type">
+                                <option value="spark_lr">Spark Logistic Regression</option>
+                                <option value="spark_rf">Spark Random Forest</option>
+                                <option value="xgboost">XGBoost</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="trainRatio" class="form-label">Training Split (%):</label>
+                            <input type="number" class="form-control" id="trainRatio" name="train_ratio" min="50" max="90" value="70">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="randomSeed" class="form-label">Random Seed:</label>
+                            <input type="number" class="form-control" id="randomSeed" name="random_seed" value="42">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Train Model</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Model Evaluation</h5>
+                <p class="card-text">Evaluate and compare trained models.</p>
+                <form action="{{ url_for('models') }}" method="post" class="my-3">
+                    <input type="hidden" name="action" value="evaluate">
+                    <button type="submit" class="btn btn-primary">Evaluate Models</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Trained Models</h5>
+                
+                {% if models %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Model ID</th>
+                                <th>Type</th>
+                                <th>AUC</th>
+                                <th>Accuracy</th>
+                                <th>Training Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for model in models %}
+                            <tr>
+                                <td>{{ model.id }}</td>
+                                <td>{{ model.type }}</td>
+                                <td>{{ model.metrics.auc|round(3) }}</td>
+                                <td>{{ model.metrics.accuracy|round(3) }}</td>
+                                <td>{{ model.created_at }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if model.is_best else 'secondary' }}">
+                                        {{ 'Best' if model.is_best else 'Trained' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary">Details</button>
+                                        <form action="{{ url_for('models') }}" method="post" class="d-inline">
+                                            <input type="hidden" name="action" value="set_best">
+                                            <input type="hidden" name="model_id" value="{{ model.id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" {% if model.is_best %}disabled{% endif %}>Set as Best</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p>No trained models available. Train a model first.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if models and models|length > 0 %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Model Comparison</h5>
+                <canvas id="modelComparisonChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if models and models|length > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('modelComparisonChart').getContext('2d');
+        
+        const labels = [{% for model in models %}'{{ model.type }} ({{ model.id }})'{% if not loop.last %}, {% endif %}{% endfor %}];
+        const aucData = [{% for model in models %}{{ model.metrics.auc }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const accuracyData = [{% for model in models %}{{ model.metrics.accuracy }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const precisionData = [{% for model in models %}{{ model.metrics.precision }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const recallData = [{% for model in models %}{{ model.metrics.recall }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        
+        const chart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['AUC', 'Accuracy', 'Precision', 'Recall', 'F1 Score'],
+                datasets: [
+                    {% for model in models %}
+                    {
+                        label: '{{ model.type }} ({{ model.id }})',
+                        data: [
+                            {{ model.metrics.auc }},
+                            {{ model.metrics.accuracy }},
+                            {{ model.metrics.precision }},
+                            {{ model.metrics.recall }},
+                            {{ model.metrics.f1 }}
+                        ],
+                        fill: true,
+                        backgroundColor: 'rgba({{ 54 + loop.index0 * 50 }}, {{ 162 + loop.index0 * 20 }}, {{ 235 - loop.index0 * 30 }}, 0.2)',
+                        borderColor: 'rgba({{ 54 + loop.index0 * 50 }}, {{ 162 + loop.index0 * 20 }}, {{ 235 - loop.index0 * 30 }}, 1)',
+                        pointBackgroundColor: 'rgba({{ 54 + loop.index0 * 50 }}, {{ 162 + loop.index0 * 20 }}, {{ 235 - loop.index0 * 30 }}, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba({{ 54 + loop.index0 * 50 }}, {{ 162 + loop.index0 * 20 }}, {{ 235 - loop.index0 * 30 }}, 1)'
+                    }{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                ]
+            },
+            options: {
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 1
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

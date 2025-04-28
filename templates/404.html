@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Risk Score Analysis{% endblock %}
+
+{% block header %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <h2 class="display-1">404</h2>
+                <p class="lead">The page you were looking for could not be found.</p>
+                <hr>
+                <p>Please check that you have the correct URL or use the navigation menu above to find what you're looking for.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">Return Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

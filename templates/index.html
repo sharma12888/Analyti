@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Risk Score Analysis{% endblock %}
+
+{% block header %}Risk Score Analysis Pipeline{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Welcome to the Risk Score Analysis System</h2>
+                <p class="card-text">
+                    This system provides an end-to-end data pipeline for risk scoring using machine learning models.
+                    The pipeline includes data ingestion, validation, feature engineering, model training, and risk scoring.
+                </p>
+                <p class="card-text">
+                    Use the navigation menu above to access different components of the system.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Data Management</h5>
+                <p class="card-text">
+                    Ingest data from various sources including PostgreSQL databases.
+                    The system can process historical data and daily updates.
+                </p>
+                <a href="{{ url_for('data') }}" class="btn btn-primary">Manage Data</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Model Training</h5>
+                <p class="card-text">
+                    Train and evaluate machine learning models for risk assessment.
+                    The system supports multiple model types including Spark ML and XGBoost.
+                </p>
+                <a href="{{ url_for('models') }}" class="btn btn-primary">Manage Models</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Risk Scoring</h5>
+                <p class="card-text">
+                    Generate risk scores for applicants using trained models.
+                    The system provides both batch scoring and individual case scoring.
+                </p>
+                <a href="{{ url_for('score') }}" class="btn btn-primary">Generate Scores</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Pipeline Management</h5>
+                <p class="card-text">
+                    Run the complete data pipeline or individual components.
+                    The system provides options for scheduling and monitoring pipeline runs.
+                </p>
+                <a href="{{ url_for('pipeline') }}" class="btn btn-primary">Manage Pipeline</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Dashboard</h5>
+                <p class="card-text">
+                    View analytics and metrics from the risk scoring system.
+                    The dashboard provides insights into model performance and risk distributions.
+                </p>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">View Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

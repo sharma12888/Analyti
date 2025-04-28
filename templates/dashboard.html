@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Risk Score Analysis{% endblock %}
+
+{% block header %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Risk Score Distribution</h5>
+                <div class="mt-3">
+                    {% if risk_distribution %}
+                    <canvas id="riskDistributionChart" width="400" height="200"></canvas>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <p>No risk score data available for visualization.</p>
+                        <p>Run the scoring pipeline to generate risk scores.</p>
+                        <a href="{{ url_for('score') }}" class="btn btn-primary">Go to Scoring</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Key Metrics</h5>
+                <div class="row">
+                    <div class="col-6 col-md-6 mb-3">
+                        <div class="card bg-secondary">
+                            <div class="card-body text-center">
+                                <h6 class="card-subtitle text-light mb-1">Total Scored</h6>
+                                <h2 class="display-6 text-white">
+                                    {% if scores %}
+                                    {{ scores.total_count }}
+                                    {% else %}
+                                    0
+                                    {% endif %}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-6 mb-3">
+                        <div class="card bg-danger">
+                            <div class="card-body text-center">
+                                <h6 class="card-subtitle text-light mb-1">High Risk</h6>
+                                <h2 class="display-6 text-white">
+                                    {% if scores %}
+                                    {{ scores.high_risk_count }}
+                                    {% else %}
+                                    0
+                                    {% endif %}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-6 mb-3">
+                        <div class="card bg-warning">
+                            <div class="card-body text-center">
+                                <h6 class="card-subtitle mb-1">Medium Risk</h6>
+                                <h2 class="display-6">
+                                    {% if scores %}
+                                    {{ scores.medium_risk_count }}
+                                    {% else %}
+                                    0
+                                    {% endif %}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-6 mb-3">
+                        <div class="card bg-success">
+                            <div class="card-body text-center">
+                                <h6 class="card-subtitle text-light mb-1">Low Risk</h6>
+                                <h2 class="display-6 text-white">
+                                    {% if scores %}
+                                    {{ scores.low_risk_count }}
+                                    {% else %}
+                                    0
+                                    {% endif %}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Model Performance</h5>
+                {% if scores and scores.model_metrics %}
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th>Model</th>
+                            <td>{{ scores.model_metrics.model_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>AUC</th>
+                            <td>{{ scores.model_metrics.auc|round(3) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Accuracy</th>
+                            <td>{{ scores.model_metrics.accuracy|round(3) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Precision</th>
+                            <td>{{ scores.model_metrics.precision|round(3) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Recall</th>
+                            <td>{{ scores.model_metrics.recall|round(3) }}</td>
+                        </tr>
+                        <tr>
+                            <th>F1 Score</th>
+                            <td>{{ scores.model_metrics.f1|round(3) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="mt-2">
+                    <a href="{{ url_for('models') }}" class="btn btn-outline-primary btn-sm">View Model Details</a>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p>No model evaluation data available.</p>
+                    <p>Train and evaluate models to see performance metrics.</p>
+                    <a href="{{ url_for('models') }}" class="btn btn-primary">Go to Models</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Recent Activity</h5>
+                {% if scores and scores.recent_scores %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Application ID</th>
+                                <th>Date</th>
+                                <th>Risk Score</th>
+                                <th>Risk Category</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for score in scores.recent_scores %}
+                            <tr>
+                                <td>{{ score.application_id }}</td>
+                                <td>{{ score.date }}</td>
+                                <td>{{ score.risk_score }}</td>
+                                <td>
+                                    <span class="badge bg-{% if score.risk_category == 'low' %}success{% elif score.risk_category == 'medium' %}warning{% else %}danger{% endif %}">
+                                        {{ score.risk_category|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary">View Details</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p>No recent scoring activity to display.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if risk_distribution %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('riskDistributionChart').getContext('2d');
+        const riskDistData = {{ risk_distribution|tojson }};
+        
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                datasets: [{
+                    label: 'Risk Distribution',
+                    data: [
+                        riskDistData.low_risk_count, 
+                        riskDistData.medium_risk_count, 
+                        riskDistData.high_risk_count
+                    ],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

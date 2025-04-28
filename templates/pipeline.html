@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Pipeline Management - Risk Score Analysis{% endblock %}
+
+{% block header %}Pipeline Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Run Complete Pipeline</h5>
+                <p class="card-text">
+                    Run the complete risk score analysis pipeline, including data ingestion, 
+                    validation, feature engineering, model training, and risk scoring.
+                </p>
+                <form action="{{ url_for('pipeline') }}" method="post" class="my-3">
+                    <input type="hidden" name="action" value="full_pipeline">
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ingestHistorical" name="ingest_historical">
+                                <label class="form-check-label" for="ingestHistorical">
+                                    Ingest Historical Data
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ingestPostgresql" name="ingest_postgresql" checked>
+                                <label class="form-check-label" for="ingestPostgresql">
+                                    Ingest PostgreSQL Data
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ingestDaily" name="ingest_daily" checked>
+                                <label class="form-check-label" for="ingestDaily">
+                                    Ingest Daily Data
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dailyDate" class="form-label">Daily Date (optional):</label>
+                            <input type="date" class="form-control" id="dailyDate" name="daily_date">
+                            <small class="form-text text-muted">If not specified, yesterday's date will be used.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="modelType" class="form-label">Model Type:</label>
+                            <select class="form-select" id="modelType" name="model_type">
+                                <option value="spark_lr">Spark Logistic Regression</option>
+                                <option value="spark_rf">Spark Random Forest</option>
+                                <option value="xgboost">XGBoost</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Run Pipeline</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Pipeline Steps</h5>
+                <p class="card-text">Run individual steps of the pipeline.</p>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Data Ingestion</h6>
+                                <p class="card-text">Ingest data from various sources.</p>
+                                <a href="{{ url_for('data') }}" class="btn btn-outline-primary btn-sm">Manage Data</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Model Training</h6>
+                                <p class="card-text">Train and evaluate models.</p>
+                                <a href="{{ url_for('models') }}" class="btn btn-outline-primary btn-sm">Manage Models</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Risk Scoring</h6>
+                                <p class="card-text">Generate risk scores.</p>
+                                <a href="{{ url_for('score') }}" class="btn btn-outline-primary btn-sm">Manage Scoring</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Pipeline Status</h5>
+                
+                <div class="pipeline-status">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Data Ingestion
+                            <span class="badge bg-secondary rounded-pill">Not Started</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Data Validation
+                            <span class="badge bg-secondary rounded-pill">Not Started</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Feature Engineering
+                            <span class="badge bg-secondary rounded-pill">Not Started</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Model Training
+                            <span class="badge bg-secondary rounded-pill">Not Started</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Model Evaluation
+                            <span class="badge bg-secondary rounded-pill">Not Started</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Risk Scoring
+                            <span class="badge bg-secondary rounded-pill">Not Started</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="pipeline-progress mt-3">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
